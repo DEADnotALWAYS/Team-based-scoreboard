@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Team 1</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      font-family: 'Courier New', monospace;
+      background-color: transparent;
+      color: white;
+      text-align: center;
+    }
+
+    .team-card {
+      width: 300px;
+      margin: 0 auto;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #1e1e1e;
+    }
+
+    .team-name {
+      font-size: 24px;
+      margin-bottom: 10px;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .team-score {
+      font-size: 64px;
+      color: #ff4d4d;
+    }
+  </style>
+</head>
+<body>
+  <div class="team-card">
+    <div class="team-name" id="name">Team</div>
+    <div class="team-score" id="score">0</div>
+  </div>
+
+  <script>
+    const sheetId = '19hFK50ZkfDgenANdFQypCUvuebOrvnqerAbyfNU0fqQ';
+    const sheetName = 'Sheet1';
+    const endpoint = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${sheetName}`;
+    const teamIndex = 2; // 0-based index: team1 is 0, team2 is 1, etc.
+
+    function fetchScore() {
+      fetch(endpoint)
+        .then(res => res.text())
+        .then(data => {
+          const json = JSON.parse(data.match(/(?<=setResponse\().*(?=\);)/s)[0]);
+          const row = json.table.rows[teamIndex];
+          const name = row.c[0]?.v.replace(/\n/g, '<br>') || '';
+          const score = row.c[1]?.v ?? '';
+          document.getElementById('name').innerHTML = name;
+          document.getElementById('score').textContent = score;
+        });
+    }
+
+    window.onload = fetchScore;
+    setInterval(fetchScore, 10000);
+  </script>
+</body>
+</html>
